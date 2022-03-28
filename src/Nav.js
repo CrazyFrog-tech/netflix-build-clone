@@ -5,12 +5,12 @@ import './Nav.css';
 function Nav() {
     const [show, handleShow] = useState(false);
     const trainsitionNavBar = () => {
-        if (window.scrollY > 100){
+        if (window.scrollY > 100) {
             handleShow(true);
-        }else{
+        } else {
             handleShow(false);
         }
-        
+
     }
 
     useEffect(() => {
@@ -23,7 +23,7 @@ function Nav() {
                 <img className='nav__logo' src='https://upload.wikimedia.org/wikipedia/commons/7/7a/Logonetflix.png' alt=''></img>
                 <img className='nav__avatar ' src='https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png' alt=''></img>
             </div>
-                        Nav</div>
+        </div>
     )
 }
 
