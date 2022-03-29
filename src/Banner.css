@@ -8,6 +8,8 @@
     margin-left: 30px;
     padding-top: 140px;
     height: 190px;
+    object-fit: contain;
+
 }
 
 .banner__title {
@@ -27,7 +29,7 @@
     background-image: linear-gradient(
         180deg,
         transparent,
-        rgba(37, 37, 0.61),
+        rgba(8, 14, 9, 0.4),
         #111
     );
 
