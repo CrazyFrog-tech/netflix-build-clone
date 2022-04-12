@@ -10,37 +10,41 @@ import LoginScreen from './screens/LoginScreen';
 import { auth } from './firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, logout, selectUser } from './features/userSlice';
+import ProfileScreen from './screens/ProfileScreen';
 
 function App() {
   const user = useSelector(selectUser);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(userAuth => { 
-      if(userAuth){
+    const unsubscribe = auth.onAuthStateChanged(userAuth => {
+      if (userAuth) {
         console.log(userAuth);
         dispatch(login({
           uid: userAuth.uid,
           email: userAuth.email,
         }));
 
-      }else{
-        dispatch(logout);
+      } else {
+        dispatch(logout());
 
       }
     });
     return unsubscribe;
-  },[]); 
+  }, [dispatch]);
   return (
     <div className="App">
       <Router>
-        <Routes>
-          {user ? <Route path='/' element={<HomeScreen></HomeScreen>}>
-          </Route> : <Route path='/' element={<LoginScreen></LoginScreen>}>
-          </Route>}
-          
-          {/* <Route path='/login' element={<LoginScreen></LoginScreen>}>
+        {!user ? <Routes><Route path='/' element={<LoginScreen></LoginScreen>}>
+        </Route> </Routes>:
+          <Routes>
+            <Route path='/' element={<HomeScreen></HomeScreen>}>
+            </Route>
+            <Route path='/profile' element={<ProfileScreen></ProfileScreen>}></Route>
+
+           {/* <Route path='/login' element={<LoginScreen></LoginScreen>}>
           </Route> */}
-        </Routes>
+          </Routes>
+        }
       </Router>
 
 
@@ -50,4 +54,3 @@ function App() {
 }
 
 export default App;
- 
