@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { selectUser } from '../features/userSlice'
 import { auth } from '../firebase';
 import Nav from '../Nav'
+import './ProfileScreen.css'
 
 function ProfileScreen() {
     const user = useSelector(selectUser);
     const history = useNavigate();
 
   return (
-    <div>
+    <div className='profileScreen'>
         <Nav />
         <div className='profileScreen__body'>
             <h1>Edit Profile</h1>
@@ -19,6 +20,8 @@ function ProfileScreen() {
                 <div className='profileScreen__details'>
                     <h2>{user.email}</h2>
                     <div className='profileScreen__plans'>
+                        <h3>Plans</h3>
+                        <p></p>
                         <button onClick={() => {auth.signOut(); history('/');}} className='profileScreen__signOut'>sign out</button>
                     </div>
                 </div>
