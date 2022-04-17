@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './Banner.css';
 import requests from './Requests';
 
+
 function Banner() {
 
     const [movie, setMovie] = useState([]);
