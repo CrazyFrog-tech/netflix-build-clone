@@ -1,4 +1,3 @@
-import { $CombinedState } from '@reduxjs/toolkit';
 import { loadStripe } from '@stripe/stripe-js';
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux';
@@ -9,6 +8,26 @@ import './PlansScreen.css'
 function PlansScreen() {
     const [products, setProducts] = useState([]);
     const user = useSelector(selectUser);
+    const [subscription, setSubscription] = useState(null);
+
+    useEffect(() => {
+        db.collection('customers')
+            .doc(user.uid)
+            .collection('subscriptions')
+            .get()
+            .then(querySnapshot => {
+                querySnapshot.forEach(async subscription => {
+                    setSubscription({
+                        role: subscription.data().role,
+                        current_period_end: subscription.data().current_period_end.seconds,
+                        current_period_start: subscription.data().current_period_start.seconds,
+                    });
+                });
+            });
+
+    }, [user.uid]);
+
+
     useEffect(() => {
         db.collection('products')
             .where('active', '==', true)
@@ -29,27 +48,30 @@ function PlansScreen() {
 
             });
     }, []);
-    console.log(products);
+
+    console.log(subscription);
+
+
     const loadCheckout = async (priceId) => {
         const docRef = await db.collection('customers')
-        .doc(user.uid).collection("checkout_sessions")
-        .add({
-            price: priceId, 
-            success_url: window.location.origin,
-            cancel_url: window.location.origin,
-        });
+            .doc(user.uid).collection("checkout_sessions")
+            .add({
+                price: priceId,
+                success_url: window.location.origin,
+                cancel_url: window.location.origin,
+            });
 
-        docRef.onSnapshot(async(snap) => {
-            const { error, sessionId} = snap.data();
-            if(error) {
+        docRef.onSnapshot(async (snap) => {
+            const { error, sessionId } = snap.data();
+            if (error) {
                 alert(`An error occured:  ${error.message}`);
 
             }
 
-            if(sessionId) {
+            if (sessionId) {
                 const stripe = await loadStripe('pk_test_51Ko4rxI5TKy53VFneXAyfjG2TEEB6iOKzTfZmmCrBqpsyHG6lN1rH7dx7QaGTkesCesqrdb6E0aKD9ksgVowkkpS00lgYifDY2');
-                stripe.redirectToCheckout({sessionId});
-                
+                stripe.redirectToCheckout({ sessionId });
+
             }
         })
 
@@ -57,17 +79,25 @@ function PlansScreen() {
 
     };
 
+
     return (
         <div className='planScreen'>
+           {subscription && 
+           <p>Renewal date:  {new Date(subscription?.current_period_end * 1000).toLocaleDateString()}</p>}
+           <br/>
             {Object.entries(products).map(([productId, productData]) => {
+
+                const isCurrentPackage = productData.name?.toLowerCase().includes(subscription?.role);
                 //TODO: add some logic
                 return (
-                    <div className='plansScreen__plan'>
+                    <div key={productId} className={`${isCurrentPackage && "planScreen__plan--disabled"}  plansScreen__plan`}>
                         <div className='plansScreen__info'>
                             <h5>{productData.name}</h5>
                             <h6>{productData.description}</h6>
                         </div>
-                        <button onClick={() => loadCheckout(productData.prices.priceId)}>Subscribe</button>
+                        <button onClick={() => !isCurrentPackage && loadCheckout(productData.prices.priceId)}>
+                            {isCurrentPackage ? 'Current Package' : 'Subscribe'}
+                        </button>
                     </div>
                 );
             })}
